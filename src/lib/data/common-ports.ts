@@ -1,0 +1,52 @@
+export type PortEntry = {
+  port: number;
+  proto: "TCP" | "UDP" | "TCP/UDP";
+  service: string;
+  note?: string;
+};
+
+export const COMMON_PORTS: PortEntry[] = [
+  { port: 20, proto: "TCP", service: "FTP data" },
+  { port: 21, proto: "TCP", service: "FTP control" },
+  { port: 22, proto: "TCP", service: "SSH" },
+  { port: 23, proto: "TCP", service: "Telnet" },
+  { port: 25, proto: "TCP", service: "SMTP" },
+  { port: 53, proto: "TCP/UDP", service: "DNS" },
+  { port: 67, proto: "UDP", service: "DHCP server" },
+  { port: 68, proto: "UDP", service: "DHCP client" },
+  { port: 69, proto: "UDP", service: "TFTP" },
+  { port: 80, proto: "TCP", service: "HTTP" },
+  { port: 110, proto: "TCP", service: "POP3" },
+  { port: 123, proto: "UDP", service: "NTP" },
+  { port: 135, proto: "TCP/UDP", service: "MS RPC" },
+  { port: 137, proto: "UDP", service: "NetBIOS name" },
+  { port: 138, proto: "UDP", service: "NetBIOS datagram" },
+  { port: 139, proto: "TCP", service: "NetBIOS session" },
+  { port: 143, proto: "TCP", service: "IMAP" },
+  { port: 161, proto: "UDP", service: "SNMP" },
+  { port: 162, proto: "UDP", service: "SNMP trap" },
+  { port: 389, proto: "TCP/UDP", service: "LDAP" },
+  { port: 443, proto: "TCP", service: "HTTPS" },
+  { port: 445, proto: "TCP", service: "SMB" },
+  { port: 465, proto: "TCP", service: "SMTPS (legacy)" },
+  { port: 514, proto: "UDP", service: "Syslog" },
+  { port: 587, proto: "TCP", service: "SMTP submission" },
+  { port: 636, proto: "TCP/UDP", service: "LDAPS" },
+  { port: 853, proto: "TCP/UDP", service: "DNS over TLS" },
+  { port: 993, proto: "TCP", service: "IMAPS" },
+  { port: 995, proto: "TCP", service: "POP3S" },
+  { port: 1433, proto: "TCP", service: "Microsoft SQL" },
+  { port: 1521, proto: "TCP", service: "Oracle DB" },
+  { port: 2049, proto: "TCP/UDP", service: "NFS" },
+  { port: 2082, proto: "TCP", service: "cPanel HTTP" },
+  { port: 2083, proto: "TCP", service: "cPanel HTTPS" },
+  { port: 3306, proto: "TCP", service: "MySQL/MariaDB" },
+  { port: 3389, proto: "TCP", service: "RDP" },
+  { port: 5432, proto: "TCP", service: "PostgreSQL" },
+  { port: 5900, proto: "TCP", service: "VNC" },
+  { port: 6379, proto: "TCP", service: "Redis" },
+  { port: 8080, proto: "TCP", service: "HTTP proxy / alt HTTP" },
+  { port: 8443, proto: "TCP", service: "HTTPS alt / dev" },
+  { port: 9200, proto: "TCP", service: "Elasticsearch HTTP" },
+  { port: 27017, proto: "TCP", service: "MongoDB" },
+];

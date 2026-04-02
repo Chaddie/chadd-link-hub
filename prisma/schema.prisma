@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  isAdmin      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SiteProfile {
+  id          String  @id
+  displayName String
+  tagline     String?
+  avatarUrl   String?
+  updatedAt   DateTime @updatedAt
+}
+
+model LinkSection {
+  id        String   @id @default(cuid())
+  title     String
+  intro     String?  @db.Text
+  sortOrder Int      @default(0)
+  links     Link[]
+}
+
+model Link {
+  id          String   @id @default(cuid())
+  sectionId String?
+  section     LinkSection? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  label       String
+  url         String
+  description String?  @db.Text
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  clicks      LinkClick[]
+
+  @@index([sectionId, sortOrder])
+}
+
+model LinkClick {
+  id        String   @id @default(cuid())
+  linkId    String
+  link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  userAgent String?  @db.Text
+  referrer  String?  @db.Text
+
+  @@index([linkId, createdAt])
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String?  @db.Text
+  content     String   @db.Text
+  published   Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published, publishedAt])
+}

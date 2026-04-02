@@ -1,0 +1,26 @@
+export type HttpStatusRow = { code: number; name: string; description: string };
+
+export const HTTP_STATUS_CODES: HttpStatusRow[] = [
+  { code: 100, name: "Continue", description: "Client should continue with request." },
+  { code: 101, name: "Switching Protocols", description: "Protocol upgrade (e.g. WebSocket)." },
+  { code: 102, name: "Processing", description: "Server processing; no response yet." },
+  { code: 200, name: "OK", description: "Request succeeded." },
+  { code: 201, name: "Created", description: "Resource created." },
+  { code: 204, name: "No Content", description: "Success with empty body." },
+  { code: 301, name: "Moved Permanently", description: "Resource moved; update bookmarks." },
+  { code: 302, name: "Found", description: "Temporary redirect (often POST→GET)." },
+  { code: 304, name: "Not Modified", description: "Cached copy still valid." },
+  { code: 400, name: "Bad Request", description: "Malformed or invalid request." },
+  { code: 401, name: "Unauthorized", description: "Authentication required." },
+  { code: 403, name: "Forbidden", description: "Authenticated but not allowed." },
+  { code: 404, name: "Not Found", description: "Resource does not exist." },
+  { code: 405, name: "Method Not Allowed", description: "HTTP method not supported for route." },
+  { code: 408, name: "Request Timeout", description: "Server waited too long for client." },
+  { code: 409, name: "Conflict", description: "State conflict with current resource." },
+  { code: 413, name: "Payload Too Large", description: "Request body exceeds limit." },
+  { code: 429, name: "Too Many Requests", description: "Rate limited." },
+  { code: 500, name: "Internal Server Error", description: "Unexpected server failure." },
+  { code: 502, name: "Bad Gateway", description: "Upstream server returned invalid response." },
+  { code: 503, name: "Service Unavailable", description: "Temporarily overloaded or maintenance." },
+  { code: 504, name: "Gateway Timeout", description: "Upstream server did not respond in time." },
+];
