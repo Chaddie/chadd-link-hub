@@ -21,15 +21,14 @@ async function main() {
     console.log("Admin user ready:", email);
   }
 
-  const profileAvatar = "https://chadd.ie/assets/img/1_1713992295.jpg";
-
   await prisma.siteProfile.upsert({
     where: { id: "site" },
     create: {
       id: "site",
       displayName: "Nathan Chadwick",
       tagline: "Technologist. SE. Frenchie Dad.",
-      avatarUrl: profileAvatar,
+      /* Default headshot is inlined in code (`src/lib/chadd-profile-image.ts` + `public/profile-avatar.jpg`). */
+      avatarUrl: null,
     },
     update: {},
   });
@@ -117,6 +116,20 @@ async function main() {
       description: "get £50 credit when signing up with this link!",
       sectionKey: "referrals",
       order: 2,
+    },
+    {
+      label: "SIMMER EATS",
+      url: "https://www.simmereats.com/r/NATHAN-KTH",
+      description: "get 30% off if you want to give it a go!",
+      sectionKey: "referrals",
+      order: 3,
+    },
+    {
+      label: "Three (mobile)",
+      url: "https://aklam.io/2StGK2PA",
+      description: "Get up to £40 in cash!",
+      sectionKey: "referrals",
+      order: 4,
     },
     {
       label: "Fitness Tracker",

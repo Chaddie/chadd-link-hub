@@ -2,7 +2,7 @@ import Image from "next/image";
 import type { Link as LinkModel, LinkSection, SiteProfile } from "@prisma/client";
 import { ProfileSocialLinks } from "@/components/ProfileSocialLinks";
 import { ShareProfileButton } from "@/components/ShareProfileButton";
-import { CHADD_PROFILE_IMAGE_URL } from "@/lib/site-avatar";
+import { getDefaultProfileImageDataUrl } from "@/lib/site-avatar";
 
 type SectionWithLinks = LinkSection & { links: LinkModel[] };
 
@@ -14,7 +14,8 @@ type Props = {
 };
 
 export function PublicHome({ profile, topLinks, sections, shareUrl }: Props) {
-  const avatarSrc = profile.avatarUrl?.trim() || CHADD_PROFILE_IMAGE_URL;
+  const avatarSrc =
+    profile.avatarUrl?.trim() || getDefaultProfileImageDataUrl();
 
   return (
     <div className="relative px-4 pb-28 pt-10 sm:pt-14">
@@ -36,7 +37,10 @@ export function PublicHome({ profile, topLinks, sections, shareUrl }: Props) {
                     className="object-cover"
                     sizes="120px"
                     priority
-                    unoptimized={avatarSrc.includes("chadd.ie")}
+                    unoptimized={
+                      avatarSrc.startsWith("data:") ||
+                      avatarSrc.includes("chadd.ie")
+                    }
                   />
                 </div>
               </div>
