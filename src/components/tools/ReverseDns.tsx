@@ -42,24 +42,25 @@ export function ReverseDns() {
           value={ip}
           onChange={(e) => setIp(e.target.value)}
           placeholder="203.0.113.10"
-          className="min-w-[200px] flex-1 rounded-lg border border-zinc-300 px-3 py-2 font-mono text-sm"
+          className="tool-input min-w-[200px] flex-1"
         />
-        <button
-          type="button"
-          onClick={run}
-          disabled={loading}
-          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
-        >
+        <button type="button" onClick={run} disabled={loading} className="tool-btn-primary">
           {loading ? "…" : "Lookup"}
         </button>
       </div>
-      {error ? <p className="mt-4 text-sm text-red-700">{error}</p> : null}
+      {error ? <p className="mt-4 text-sm text-red-600 dark:text-red-400">{error}</p> : null}
       {hostnames ? (
-        <ul className="mt-6 list-inside list-disc rounded-xl border border-zinc-200 bg-white p-4 font-mono text-sm">
+        <ul
+          className="mt-6 list-inside list-disc rounded-2xl border p-4 font-mono text-sm text-foreground/90 backdrop-blur-sm"
+          style={{
+            borderColor: "var(--tool-panel-border)",
+            background: "var(--tool-panel-bg)",
+          }}
+        >
           {hostnames.length ? (
             hostnames.map((h) => <li key={h}>{h}</li>)
           ) : (
-            <li className="list-none text-zinc-500">No PTR records returned.</li>
+            <li className="list-none text-muted-foreground">No PTR records returned.</li>
           )}
         </ul>
       ) : null}

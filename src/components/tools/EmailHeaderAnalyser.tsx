@@ -21,23 +21,23 @@ export function EmailHeaderAnalyser() {
         value={raw}
         onChange={(e) => setRaw(e.target.value)}
         rows={12}
-        className="w-full rounded-lg border border-zinc-300 p-3 font-mono text-xs text-zinc-900"
-        placeholder="Return-Path: ...&#10;Received: from ...&#10;..."
+        className="tool-textarea min-h-[12rem]"
+        placeholder={"Return-Path: ...\nReceived: from ...\n..."}
       />
       {!parsed ? (
-        <p className="mt-4 text-sm text-zinc-500">Paste headers to analyse.</p>
+        <p className="mt-4 text-sm text-muted-foreground">Paste headers to analyse.</p>
       ) : (
         <div className="mt-6 space-y-6">
           <section>
-            <h2 className="text-sm font-semibold text-zinc-900">Auth summary</h2>
-            <ul className="mt-2 list-inside list-disc text-sm text-zinc-700">
+            <h2 className="text-sm font-semibold text-foreground">Auth summary</h2>
+            <ul className="mt-2 list-inside list-disc text-sm text-foreground/85">
               {summary.map((s) => (
                 <li key={s}>{s}</li>
               ))}
             </ul>
           </section>
           <section>
-            <h2 className="text-sm font-semibold text-zinc-900">Core metadata</h2>
+            <h2 className="text-sm font-semibold text-foreground">Core metadata</h2>
             <dl className="mt-2 space-y-1 text-sm">
               {[
                 ["From", parsed.from.join(", ")],
@@ -50,16 +50,18 @@ export function EmailHeaderAnalyser() {
               ].map(([k, v]) =>
                 v ? (
                   <div key={k} className="grid gap-1 sm:grid-cols-[100px_1fr]">
-                    <dt className="text-zinc-500">{k}</dt>
-                    <dd className="break-all text-zinc-900">{v}</dd>
+                    <dt className="text-muted-foreground">{k}</dt>
+                    <dd className="break-all text-foreground/90">{v}</dd>
                   </div>
                 ) : null
               )}
             </dl>
           </section>
           <section>
-            <h2 className="text-sm font-semibold text-zinc-900">Received (newest first in source)</h2>
-            <ol className="mt-2 list-decimal space-y-2 pl-5 text-xs text-zinc-800">
+            <h2 className="text-sm font-semibold text-foreground">
+              Received (newest first in source)
+            </h2>
+            <ol className="mt-2 list-decimal space-y-2 pl-5 text-xs text-foreground/80">
               {parsed.received.map((r, i) => (
                 <li key={i} className="break-all font-mono">
                   {r}
@@ -68,15 +70,17 @@ export function EmailHeaderAnalyser() {
             </ol>
           </section>
           <section>
-            <h2 className="text-sm font-semibold text-zinc-900">Authentication-Results</h2>
-            <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded-lg bg-zinc-50 p-3 font-mono text-xs">
+            <h2 className="text-sm font-semibold text-foreground">Authentication-Results</h2>
+            <pre className="tool-pre mt-2 whitespace-pre-wrap">
               {parsed.authenticationResults.join("\n\n") || "—"}
             </pre>
           </section>
           <section>
-            <h2 className="text-sm font-semibold text-zinc-900">DKIM-Signature (truncated)</h2>
-            <pre className="mt-2 max-h-40 overflow-auto rounded-lg bg-zinc-50 p-3 font-mono text-[10px]">
-              {parsed.dkimSignature.map((d) => d.slice(0, 400) + (d.length > 400 ? "…" : "")).join("\n\n") || "—"}
+            <h2 className="text-sm font-semibold text-foreground">DKIM-Signature (truncated)</h2>
+            <pre className="tool-pre mt-2 max-h-40 overflow-auto text-[10px] leading-relaxed">
+              {parsed.dkimSignature
+                .map((d) => d.slice(0, 400) + (d.length > 400 ? "…" : ""))
+                .join("\n\n") || "—"}
             </pre>
           </section>
         </div>

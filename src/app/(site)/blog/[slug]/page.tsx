@@ -2,6 +2,7 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
+import { BlogPostLabels } from "@/components/BlogPostLabels";
 import { getPrisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -31,25 +32,34 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   return (
-    <article className="mx-auto max-w-2xl px-4 py-12">
-      <Link href="/blog" className="text-sm font-medium text-zinc-600 hover:text-zinc-900">
-        ← Blog
-      </Link>
-      <header className="mt-6">
-        <h1 className="font-serif text-3xl font-semibold tracking-tight text-zinc-900">
-          {post.title}
-        </h1>
-        {post.publishedAt ? (
-          <time
-            dateTime={post.publishedAt.toISOString()}
-            className="mt-2 block text-sm text-zinc-500"
+    <article className="mx-auto max-w-2xl px-4 pb-20 pt-6">
+      <div className="glass-panel">
+        <div className="glass-panel-shine opacity-80" aria-hidden />
+        <div className="relative">
+          <Link
+            href="/blog"
+            className="text-sm font-medium text-accent transition hover:opacity-80"
           >
-            {format(post.publishedAt, "MMMM d, yyyy")}
-          </time>
-        ) : null}
-      </header>
-      <div className="mt-8 max-w-none space-y-4 text-[15px] leading-relaxed text-zinc-800 [&_a]:font-medium [&_a]:text-zinc-900 [&_a]:underline [&_blockquote]:border-l-4 [&_blockquote]:border-zinc-300 [&_blockquote]:pl-4 [&_code]:rounded [&_code]:bg-zinc-100 [&_code]:px-1 [&_h1]:mt-8 [&_h1]:text-2xl [&_h1]:font-semibold [&_h2]:mt-8 [&_h2]:text-xl [&_h2]:font-semibold [&_li]:my-1 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-3 [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-zinc-100 [&_pre]:p-3 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-6">
-        <ReactMarkdown>{post.content}</ReactMarkdown>
+            ← Blog
+          </Link>
+          <header className="mt-6">
+            <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+              {post.title}
+            </h1>
+            {post.publishedAt ? (
+              <time
+                dateTime={post.publishedAt.toISOString()}
+                className="mt-2 block text-sm text-muted-foreground"
+              >
+                {format(post.publishedAt, "MMMM d, yyyy")}
+              </time>
+            ) : null}
+            <BlogPostLabels labels={post.labels ?? []} linkToFilter />
+          </header>
+          <div className="prose-blog mt-8">
+            <ReactMarkdown>{post.content}</ReactMarkdown>
+          </div>
+        </div>
       </div>
     </article>
   );

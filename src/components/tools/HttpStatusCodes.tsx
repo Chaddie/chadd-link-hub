@@ -26,23 +26,38 @@ export function HttpStatusCodes() {
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Filter…"
-        className="w-full max-w-md rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+        className="tool-input max-w-md font-sans"
       />
-      <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-200 bg-white">
+      <div
+        className="mt-4 overflow-x-auto rounded-2xl border backdrop-blur-sm"
+        style={{
+          borderColor: "var(--tool-panel-border)",
+          background: "var(--tool-panel-bg)",
+        }}
+      >
         <table className="w-full min-w-[520px] text-left text-sm">
           <thead>
-            <tr className="border-b border-zinc-200 bg-zinc-50 text-zinc-600">
-              <th className="px-3 py-2 font-medium">Code</th>
-              <th className="px-3 py-2 font-medium">Name</th>
-              <th className="px-3 py-2 font-medium">Description</th>
+            <tr
+              className="border-b text-muted-foreground"
+              style={{ borderColor: "var(--tool-panel-border)" }}
+            >
+              <th className="bg-black/[0.03] px-3 py-2 font-medium dark:bg-white/[0.06]">
+                Code
+              </th>
+              <th className="bg-black/[0.03] px-3 py-2 font-medium dark:bg-white/[0.06]">
+                Name
+              </th>
+              <th className="bg-black/[0.03] px-3 py-2 font-medium dark:bg-white/[0.06]">
+                Description
+              </th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.code} className="border-b border-zinc-100">
+              <tr key={r.code} className="border-b border-border/60 text-foreground/90">
                 <td className="px-3 py-2 font-mono tabular-nums">{r.code}</td>
                 <td className="px-3 py-2 font-medium">{r.name}</td>
-                <td className="px-3 py-2 text-zinc-700">{r.description}</td>
+                <td className="px-3 py-2">{r.description}</td>
               </tr>
             ))}
           </tbody>

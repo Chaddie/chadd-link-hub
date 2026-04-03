@@ -26,20 +26,38 @@ export function PortReference() {
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Filter by port, protocol, or name…"
-        className="w-full max-w-md rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+        className="tool-input max-w-md font-sans"
       />
-      <div className="mt-4 overflow-x-auto rounded-xl border border-zinc-200 bg-white">
+      <div
+        className="mt-4 overflow-x-auto rounded-2xl border backdrop-blur-sm"
+        style={{
+          borderColor: "var(--tool-panel-border)",
+          background: "var(--tool-panel-bg)",
+        }}
+      >
         <table className="w-full min-w-[480px] text-left text-sm">
           <thead>
-            <tr className="border-b border-zinc-200 bg-zinc-50 text-zinc-600">
-              <th className="px-3 py-2 font-medium">Port</th>
-              <th className="px-3 py-2 font-medium">Protocol</th>
-              <th className="px-3 py-2 font-medium">Service</th>
+            <tr
+              className="border-b text-muted-foreground"
+              style={{ borderColor: "var(--tool-panel-border)" }}
+            >
+              <th className="bg-black/[0.03] px-3 py-2 font-medium dark:bg-white/[0.06]">
+                Port
+              </th>
+              <th className="bg-black/[0.03] px-3 py-2 font-medium dark:bg-white/[0.06]">
+                Protocol
+              </th>
+              <th className="bg-black/[0.03] px-3 py-2 font-medium dark:bg-white/[0.06]">
+                Service
+              </th>
             </tr>
           </thead>
           <tbody>
             {rows.map((p) => (
-              <tr key={`${p.port}-${p.proto}-${p.service}`} className="border-b border-zinc-100">
+              <tr
+                key={`${p.port}-${p.proto}-${p.service}`}
+                className="border-b border-border/60 text-foreground/95"
+              >
                 <td className="px-3 py-2 font-mono tabular-nums">{p.port}</td>
                 <td className="px-3 py-2">{p.proto}</td>
                 <td className="px-3 py-2">{p.service}</td>

@@ -1,6 +1,7 @@
 "use server";
 
 import { auth } from "@/lib/auth";
+import { parseLabelsFromForm } from "@/lib/blog-labels";
 import { getPrisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
@@ -26,6 +27,7 @@ export async function createBlogPost(formData: FormData) {
   const excerpt = String(formData.get("excerpt") ?? "").trim() || null;
   const content = String(formData.get("content") ?? "");
   const published = String(formData.get("published") ?? "") === "on";
+  const labels = parseLabelsFromForm(formData);
 
   if (!title) throw new Error("Title is required");
   if (!slug) slug = slugify(title);
@@ -39,6 +41,7 @@ export async function createBlogPost(formData: FormData) {
       slug,
       excerpt,
       content,
+      labels,
       published,
       publishedAt,
     },
@@ -56,6 +59,7 @@ export async function updateBlogPost(formData: FormData) {
   const excerpt = String(formData.get("excerpt") ?? "").trim() || null;
   const content = String(formData.get("content") ?? "");
   const published = String(formData.get("published") ?? "") === "on";
+  const labels = parseLabelsFromForm(formData);
 
   if (!id || !title) throw new Error("Invalid post");
   if (!slug) slug = slugify(title);
@@ -79,6 +83,7 @@ export async function updateBlogPost(formData: FormData) {
       slug,
       excerpt,
       content,
+      labels,
       published,
       publishedAt,
     },

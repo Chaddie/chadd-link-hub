@@ -57,6 +57,46 @@ export const TOOLS: ToolDefinition[] = [
     description:
       "Decode a Windows Autopilot hardware hash to inspect embedded device metadata.",
   },
+  {
+    slug: "spf-generator",
+    title: "SPF record generator",
+    description: "Build a v=spf1 TXT line from IPs, includes, and policy.",
+  },
+  {
+    slug: "base64-file-converter",
+    title: "Base64 file converter",
+    description: "Encode files to Base64 or decode Base64 to a downloadable file.",
+  },
+  {
+    slug: "yaml-json-converter",
+    title: "YAML ↔ JSON converter",
+    description: "Convert between YAML and JSON in the browser.",
+  },
+  {
+    slug: "regex-tester",
+    title: "Regex tester",
+    description: "JavaScript RegExp tester with matches and replacement preview.",
+  },
+  {
+    slug: "mime-converter",
+    title: "MIME type converter",
+    description: "Map extensions to MIME types and back.",
+  },
+  {
+    slug: "qr-code-generator",
+    title: "QR code generator",
+    description: "Create a QR image from text or a URL and download PNG.",
+  },
+  {
+    slug: "mac-address-lookup",
+    title: "MAC address lookup",
+    description: "OUI vendor hint from a device MAC address.",
+  },
+  {
+    slug: "imperial-metric-converter",
+    title: "Imperial / metric converter",
+    description: "Length, mass, volume, and temperature conversions.",
+  },
 ];
 
 const slugByCompact = new Map<string, string>();

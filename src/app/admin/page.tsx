@@ -52,46 +52,44 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">Dashboard</h1>
-        <p className="mt-1 text-sm text-zinc-600">
+        <h1 className="font-display text-2xl font-semibold text-foreground">Dashboard</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Click analytics for your link hub.
         </p>
       </div>
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-medium text-zinc-900">Total clicks</h2>
-        <p className="mt-2 text-4xl font-semibold tabular-nums text-zinc-900">
+      <section className="admin-card">
+        <h2 className="text-lg font-medium text-foreground">Total clicks</h2>
+        <p className="mt-2 text-4xl font-semibold tabular-nums text-foreground">
           {totalClicks}
         </p>
       </section>
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-lg font-medium text-zinc-900">
-          Last 7 days
-        </h2>
+      <section className="admin-card">
+        <h2 className="mb-4 text-lg font-medium text-foreground">Last 7 days</h2>
         <ClicksChart data={chartData} />
       </section>
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-lg font-medium text-zinc-900">Top links</h2>
+      <section className="admin-card">
+        <h2 className="mb-4 text-lg font-medium text-foreground">Top links</h2>
         {byLink.length === 0 ? (
-          <p className="text-sm text-zinc-500">No clicks recorded yet.</p>
+          <p className="text-sm text-muted-foreground">No clicks recorded yet.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-200 text-zinc-600">
+                <tr className="border-b border-border text-muted-foreground">
                   <th className="pb-2 pr-4 font-medium">Link</th>
                   <th className="pb-2 font-medium">Clicks</th>
                 </tr>
               </thead>
               <tbody>
                 {byLink.map((row) => (
-                  <tr key={row.linkId} className="border-b border-zinc-100">
-                    <td className="py-2 pr-4">
+                  <tr key={row.linkId} className="border-b border-border/60">
+                    <td className="py-2 pr-4 text-foreground">
                       {labelById[row.linkId] ?? row.linkId}
                     </td>
-                    <td className="py-2 tabular-nums">{row._count._all}</td>
+                    <td className="py-2 tabular-nums text-foreground">{row._count._all}</td>
                   </tr>
                 ))}
               </tbody>

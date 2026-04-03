@@ -1,5 +1,8 @@
 import Image from "next/image";
 import type { Link as LinkModel, LinkSection, SiteProfile } from "@prisma/client";
+import { ProfileSocialLinks } from "@/components/ProfileSocialLinks";
+import { ShareProfileButton } from "@/components/ShareProfileButton";
+import { CHADD_PROFILE_IMAGE_URL } from "@/lib/site-avatar";
 
 type SectionWithLinks = LinkSection & { links: LinkModel[] };
 
@@ -7,75 +10,81 @@ type Props = {
   profile: SiteProfile;
   topLinks: LinkModel[];
   sections: SectionWithLinks[];
+  shareUrl: string;
 };
 
-export function PublicHome({ profile, topLinks, sections }: Props) {
+export function PublicHome({ profile, topLinks, sections, shareUrl }: Props) {
+  const avatarSrc = profile.avatarUrl?.trim() || CHADD_PROFILE_IMAGE_URL;
+
   return (
-    <div className="min-h-screen bg-[var(--page-bg)] text-[var(--text-primary)]">
-      <div className="mx-auto flex max-w-md flex-col items-center px-5 pb-24 pt-14 sm:max-w-lg sm:pt-20">
-        <header className="mb-10 flex w-full flex-col items-center text-center">
-          {profile.avatarUrl ? (
-            <div className="relative mb-5 h-28 w-28 overflow-hidden rounded-full border border-[var(--border)] bg-white shadow-sm">
-              <Image
-                src={profile.avatarUrl}
-                alt=""
-                fill
-                className="object-cover"
-                sizes="112px"
-                unoptimized
+    <div className="relative px-4 pb-28 pt-10 sm:pt-14">
+      <div className="mx-auto w-full max-w-md sm:max-w-lg">
+        <div className="glass-panel">
+          <div className="glass-panel-shine" aria-hidden />
+          <div className="relative">
+            <header className="mb-10 flex w-full flex-col items-center text-center">
+              <div className="relative mb-6">
+                <div
+                  className="absolute -inset-1 rounded-full bg-gradient-to-br from-violet-400/35 via-white/15 to-cyan-400/25 opacity-90 blur-md dark:from-violet-400/40 dark:via-white/20"
+                  aria-hidden
+                />
+                <div className="relative h-[7.5rem] w-[7.5rem] overflow-hidden rounded-full border border-[color:var(--link-border)] bg-black/10 shadow-xl ring-2 ring-black/[0.06] dark:bg-black/20 dark:ring-white/10">
+                  <Image
+                    src={avatarSrc}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="120px"
+                    priority
+                    unoptimized={avatarSrc.includes("chadd.ie")}
+                  />
+                </div>
+              </div>
+              <ShareProfileButton
+                shareUrl={shareUrl}
+                title={profile.displayName}
+                text={profile.tagline ?? undefined}
               />
-            </div>
-          ) : (
-            <div
-              className="mb-5 flex h-28 w-28 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--avatar-placeholder)] text-3xl font-semibold text-[var(--text-muted)] shadow-sm"
-              aria-hidden
-            >
-              {profile.displayName
-                .split(/\s+/)
-                .map((w) => w[0])
-                .join("")
-                .slice(0, 2)
-                .toUpperCase()}
-            </div>
-          )}
-          <p className="mb-1 text-xs font-medium uppercase tracking-[0.2em] text-[var(--text-muted)]">
-            Share
-          </p>
-          <h1 className="font-serif text-3xl font-semibold tracking-tight text-[var(--text-heading)] sm:text-4xl">
-            {profile.displayName}
-          </h1>
-          {profile.tagline ? (
-            <p className="mt-3 max-w-md text-base leading-relaxed text-[var(--text-secondary)]">
-              {profile.tagline}
-            </p>
-          ) : null}
-        </header>
+              <h1 className="font-display text-[1.85rem] font-semibold tracking-tight sm:text-4xl sm:leading-tight">
+                {profile.displayName}
+              </h1>
+              {profile.tagline ? (
+                <p className="mt-4 max-w-md text-[15px] leading-relaxed text-muted-foreground">
+                  {profile.tagline}
+                </p>
+              ) : null}
+              <ProfileSocialLinks
+                className={profile.tagline ? "mt-5" : "mt-4"}
+              />
+            </header>
 
-        <nav className="w-full space-y-3" aria-label="Links">
-          {topLinks.map((link) => (
-            <TrackedLink key={link.id} link={link} />
-          ))}
-        </nav>
-
-        {sections.map((section) => (
-          <section key={section.id} className="mt-12 w-full">
-            <h2 className="mb-1 text-center font-serif text-xl font-semibold text-[var(--text-heading)]">
-              {section.title}
-            </h2>
-            {section.intro ? (
-              <p className="mb-6 text-center text-sm leading-relaxed text-[var(--text-secondary)]">
-                {section.intro}
-              </p>
-            ) : (
-              <div className="mb-6" />
-            )}
-            <div className="space-y-3">
-              {section.links.map((link) => (
+            <nav className="w-full space-y-3" aria-label="Links">
+              {topLinks.map((link) => (
                 <TrackedLink key={link.id} link={link} />
               ))}
-            </div>
-          </section>
-        ))}
+            </nav>
+
+            {sections.map((section) => (
+              <section key={section.id} className="mt-12 w-full">
+                <h2 className="mb-2 text-center font-display text-xl font-semibold tracking-tight">
+                  {section.title}
+                </h2>
+                {section.intro ? (
+                  <p className="mb-6 text-center text-sm leading-relaxed text-muted-foreground">
+                    {section.intro}
+                  </p>
+                ) : (
+                  <div className="mb-6" />
+                )}
+                <div className="space-y-3">
+                  {section.links.map((link) => (
+                    <TrackedLink key={link.id} link={link} />
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -86,12 +95,25 @@ function TrackedLink({ link }: { link: LinkModel }) {
     <div>
       <a
         href={`/go/${link.id}`}
-        className="flex w-full items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] px-4 py-3.5 text-center text-[15px] font-medium leading-snug text-[var(--text-heading)] shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition hover:-translate-y-px hover:border-[var(--border-hover)] hover:bg-[var(--card-hover)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)]"
+        className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl border px-4 py-3.5 text-center text-[15px] font-medium leading-snug shadow-lg backdrop-blur-md transition duration-300 hover:-translate-y-0.5 hover:[background:var(--link-bg-hover)] active:translate-y-0"
+        style={{
+          borderColor: "var(--link-border)",
+          background: "var(--link-bg)",
+          color: "var(--foreground)",
+        }}
       >
-        {link.label}
+        <span
+          className="pointer-events-none absolute inset-0 opacity-0 transition duration-300 group-hover:opacity-100"
+          style={{
+            background:
+              "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.18) 50%, transparent 60%)",
+          }}
+          aria-hidden
+        />
+        <span className="relative">{link.label}</span>
       </a>
       {link.description ? (
-        <p className="mt-2 px-1 text-center text-sm leading-snug text-[var(--text-secondary)]">
+        <p className="mt-2.5 px-1 text-center text-[13px] leading-snug text-muted-foreground">
           {link.description}
         </p>
       ) : null}

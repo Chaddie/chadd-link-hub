@@ -38,8 +38,8 @@ export function IpGeolocation() {
     if (v === undefined || v === null || v === "") return null;
     return (
       <div key={k} className="grid gap-1 sm:grid-cols-[160px_1fr] sm:gap-4">
-        <dt className="text-zinc-500">{label}</dt>
-        <dd className="font-mono text-sm text-zinc-900">{String(v)}</dd>
+        <dt className="text-muted-foreground">{label}</dt>
+        <dd className="font-mono text-sm text-foreground">{String(v)}</dd>
       </div>
     );
   };
@@ -54,20 +54,21 @@ export function IpGeolocation() {
           value={ip}
           onChange={(e) => setIp(e.target.value)}
           placeholder="203.0.113.42"
-          className="min-w-[200px] flex-1 rounded-lg border border-zinc-300 px-3 py-2 font-mono text-sm"
+          className="tool-input min-w-[200px] flex-1"
         />
-        <button
-          type="button"
-          onClick={lookup}
-          disabled={loading}
-          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
-        >
+        <button type="button" onClick={lookup} disabled={loading} className="tool-btn-primary">
           {loading ? "…" : "Lookup"}
         </button>
       </div>
-      {error ? <p className="mt-4 text-sm text-red-700">{error}</p> : null}
+      {error ? <p className="mt-4 text-sm text-red-600 dark:text-red-400">{error}</p> : null}
       {data ? (
-        <dl className="mt-6 space-y-2 rounded-xl border border-zinc-200 bg-white p-4">
+        <dl
+          className="mt-6 flex flex-col gap-2 rounded-2xl border p-4 backdrop-blur-sm"
+          style={{
+            borderColor: "var(--tool-panel-border)",
+            background: "var(--tool-panel-bg)",
+          }}
+        >
           {row("ip", "IP")}
           {row("city", "City")}
           {row("region", "Region")}

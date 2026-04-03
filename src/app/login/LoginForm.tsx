@@ -38,12 +38,15 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error ? (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800" role="alert">
+        <p
+          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200"
+          role="alert"
+        >
           {error}
         </p>
       ) : null}
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-zinc-800">
+        <label htmlFor="email" className="admin-label">
           Email
         </label>
         <input
@@ -52,11 +55,11 @@ export function LoginForm() {
           type="email"
           required
           autoComplete="email"
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+          className="admin-input"
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-zinc-800">
+        <label htmlFor="password" className="admin-label">
           Password
         </label>
         <input
@@ -65,13 +68,13 @@ export function LoginForm() {
           type="password"
           required
           autoComplete="current-password"
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 shadow-sm focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+          className="admin-input"
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-lg bg-zinc-900 py-2.5 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
+        className="admin-btn-primary w-full disabled:opacity-60"
       >
         {pending ? "Signing in…" : "Sign in"}
       </button>

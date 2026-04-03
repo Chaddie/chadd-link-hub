@@ -22,6 +22,9 @@ function pickFrom(alphabet: string, count: number) {
   return out;
 }
 
+const check =
+  "rounded border border-border bg-card/80 text-foreground accent-[color:var(--accent)] dark:bg-white/10";
+
 export function PasswordGenerator() {
   const [length, setLength] = useState(20);
   const [lower, setLower] = useState(true);
@@ -57,59 +60,74 @@ export function PasswordGenerator() {
       title="Password generator"
       description="Uses the browser crypto API (CSPRNG). Length is capped at 128."
     >
-      <div className="space-y-4 rounded-xl border border-zinc-200 bg-white p-4">
+      <div
+        className="mt-0 space-y-4 rounded-2xl border p-5 backdrop-blur-sm"
+        style={{
+          borderColor: "var(--tool-panel-border)",
+          background: "var(--tool-panel-bg)",
+        }}
+      >
         <div>
-          <label className="text-sm font-medium text-zinc-800">Length</label>
+          <label className="text-sm font-medium text-muted-foreground">Length</label>
           <input
             type="number"
             min={4}
             max={128}
             value={length}
             onChange={(e) => setLength(Number(e.target.value))}
-            className="mt-1 w-28 rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+            className="tool-input mt-1 w-28 max-w-none font-sans tabular-nums"
           />
         </div>
-        <div className="flex flex-wrap gap-4 text-sm">
-          <label className="flex items-center gap-2">
-            <input type="checkbox" checked={lower} onChange={(e) => setLower(e.target.checked)} />
+        <div className="flex flex-wrap gap-4 text-sm text-foreground/90">
+          <label className="flex cursor-pointer items-center gap-2">
+            <input
+              type="checkbox"
+              checked={lower}
+              onChange={(e) => setLower(e.target.checked)}
+              className={check}
+            />
             Lowercase
           </label>
-          <label className="flex items-center gap-2">
-            <input type="checkbox" checked={upper} onChange={(e) => setUpper(e.target.checked)} />
+          <label className="flex cursor-pointer items-center gap-2">
+            <input
+              type="checkbox"
+              checked={upper}
+              onChange={(e) => setUpper(e.target.checked)}
+              className={check}
+            />
             Uppercase
           </label>
-          <label className="flex items-center gap-2">
-            <input type="checkbox" checked={digits} onChange={(e) => setDigits(e.target.checked)} />
+          <label className="flex cursor-pointer items-center gap-2">
+            <input
+              type="checkbox"
+              checked={digits}
+              onChange={(e) => setDigits(e.target.checked)}
+              className={check}
+            />
             Digits
           </label>
-          <label className="flex items-center gap-2">
-            <input type="checkbox" checked={symbols} onChange={(e) => setSymbols(e.target.checked)} />
+          <label className="flex cursor-pointer items-center gap-2">
+            <input
+              type="checkbox"
+              checked={symbols}
+              onChange={(e) => setSymbols(e.target.checked)}
+              className={check}
+            />
             Symbols
           </label>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={generate}
-            className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-          >
+          <button type="button" onClick={generate} className="tool-btn-primary">
             Generate
           </button>
-          <button
-            type="button"
-            onClick={copy}
-            disabled={!pwd}
-            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm disabled:opacity-50"
-          >
+          <button type="button" onClick={copy} disabled={!pwd} className="tool-btn-secondary">
             Copy
           </button>
         </div>
         {pwd ? (
-          <pre className="overflow-x-auto whitespace-pre-wrap break-all rounded-lg bg-zinc-50 p-3 font-mono text-sm text-zinc-900">
-            {pwd}
-          </pre>
+          <pre className="tool-pre whitespace-pre-wrap break-all text-sm">{pwd}</pre>
         ) : (
-          <p className="text-sm text-zinc-500">Choose character sets and click Generate.</p>
+          <p className="text-sm text-muted-foreground">Choose character sets and click Generate.</p>
         )}
       </div>
     </ToolShell>

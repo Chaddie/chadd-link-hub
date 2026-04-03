@@ -1,6 +1,7 @@
 import { MissingDatabase } from "@/components/MissingDatabase";
 import { PublicHome } from "@/components/PublicHome";
 import { getPrisma, isDatabaseAvailable } from "@/lib/prisma";
+import { getSiteOrigin } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 
@@ -31,5 +32,15 @@ export default async function Home() {
     },
   });
 
-  return <PublicHome profile={profile} topLinks={topLinks} sections={sections} />;
+  const origin = await getSiteOrigin();
+  const shareUrl = `${origin}/`;
+
+  return (
+    <PublicHome
+      profile={profile}
+      topLinks={topLinks}
+      sections={sections}
+      shareUrl={shareUrl}
+    />
+  );
 }

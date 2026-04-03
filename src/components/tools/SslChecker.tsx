@@ -15,6 +15,8 @@ type SslResult = {
   authorizationError: string | null;
 };
 
+const inp = "tool-input font-sans";
+
 export function SslChecker() {
   const [host, setHost] = useState("");
   const [port, setPort] = useState("443");
@@ -55,70 +57,71 @@ export function SslChecker() {
     >
       <div className="flex flex-wrap items-end gap-2">
         <div>
-          <label className="text-xs font-medium text-zinc-600">Hostname</label>
+          <label className="text-xs font-medium text-muted-foreground">Hostname</label>
           <input
             value={host}
             onChange={(e) => setHost(e.target.value)}
             placeholder="example.com"
-            className="mt-0.5 block w-56 rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+            className={`mt-0.5 block w-56 max-w-none ${inp}`}
           />
         </div>
         <div>
-          <label className="text-xs font-medium text-zinc-600">Port</label>
+          <label className="text-xs font-medium text-muted-foreground">Port</label>
           <input
             value={port}
             onChange={(e) => setPort(e.target.value)}
-            className="mt-0.5 block w-20 rounded-lg border border-zinc-300 px-3 py-2 text-sm"
+            className={`mt-0.5 block w-24 max-w-none ${inp}`}
           />
         </div>
-        <button
-          type="button"
-          onClick={check}
-          disabled={loading}
-          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
-        >
+        <button type="button" onClick={check} disabled={loading} className="tool-btn-primary">
           {loading ? "…" : "Check"}
         </button>
       </div>
-      {error ? <p className="mt-4 text-sm text-red-700">{error}</p> : null}
+      {error ? <p className="mt-4 text-sm text-red-600 dark:text-red-400">{error}</p> : null}
       {result ? (
-        <div className="mt-6 space-y-4 rounded-xl border border-zinc-200 bg-white p-4 text-sm">
+        <div
+          className="mt-6 space-y-4 rounded-2xl border p-4 text-sm backdrop-blur-sm"
+          style={{
+            borderColor: "var(--tool-panel-border)",
+            background: "var(--tool-panel-bg)",
+          }}
+        >
           <div>
-            <p className="text-xs font-medium uppercase text-zinc-500">Subject</p>
-            <p className="font-mono text-zinc-900">{result.subject || "—"}</p>
+            <p className="text-xs font-medium uppercase text-muted-foreground">Subject</p>
+            <p className="font-mono text-foreground">{result.subject || "—"}</p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase text-zinc-500">Issuer</p>
-            <p className="font-mono text-zinc-900">{result.issuer || "—"}</p>
+            <p className="text-xs font-medium uppercase text-muted-foreground">Issuer</p>
+            <p className="font-mono text-foreground">{result.issuer || "—"}</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <p className="text-xs font-medium uppercase text-zinc-500">Valid from</p>
-              <p className="font-mono">{result.validFrom}</p>
+              <p className="text-xs font-medium uppercase text-muted-foreground">Valid from</p>
+              <p className="font-mono text-foreground/90">{result.validFrom}</p>
             </div>
             <div>
-              <p className="text-xs font-medium uppercase text-zinc-500">Valid to</p>
-              <p className="font-mono">{result.validTo}</p>
+              <p className="text-xs font-medium uppercase text-muted-foreground">Valid to</p>
+              <p className="font-mono text-foreground/90">{result.validTo}</p>
             </div>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase text-zinc-500">Serial</p>
-            <p className="break-all font-mono">{result.serialNumber}</p>
+            <p className="text-xs font-medium uppercase text-muted-foreground">Serial</p>
+            <p className="break-all font-mono text-foreground/90">{result.serialNumber}</p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase text-zinc-500">SHA-256 fingerprint</p>
-            <p className="break-all font-mono text-xs">{result.fingerprint256}</p>
+            <p className="text-xs font-medium uppercase text-muted-foreground">SHA-256 fingerprint</p>
+            <p className="break-all font-mono text-xs text-muted-foreground">{result.fingerprint256}</p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase text-zinc-500">Subject Alternative Names</p>
-            <ul className="list-inside list-disc font-mono text-xs text-zinc-800">
+            <p className="text-xs font-medium uppercase text-muted-foreground">Subject Alternative Names</p>
+            <ul className="list-inside list-disc font-mono text-xs text-foreground/85">
               {result.subjectAltNames?.length
                 ? result.subjectAltNames.map((s) => <li key={s}>{s}</li>)
                 : "—"}
             </ul>
           </div>
           <div>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-muted-foreground">
               Chain trusted by Node: {result.authorized ? "yes" : "no"}
               {result.authorizationError ? ` (${result.authorizationError})` : ""}
             </p>
