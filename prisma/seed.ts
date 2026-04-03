@@ -435,6 +435,122 @@ UI names change—**search UniFi’s release notes for “mDNS” or “multicas
       labels: ["Networking", "Firewall", "Configuration"],
       publishedAt: new Date("2026-04-04T10:00:00.000Z"),
     },
+    {
+      slug: "sophos-firewall-on-proxmox",
+      title: "Running Sophos Firewall on Proxmox: what works well in the lab",
+      excerpt:
+        "Stand up Sophos Firewall (SFOS) as a VM on Proxmox for proof-of-concept or lab: images, NICs, resources, and a few pitfalls before you mirror the same design in production hardware.",
+      content: `## Why Proxmox first
+
+**Proxmox VE** is a convenient place to learn **Sophos Firewall** (SFOS) without racking appliances: snapshots, cloning, and cheap VLAN plumbing on a single host. Treat it as **lab or pilot**, not a substitute for sizing, support, and hardware compatibility matrices unless Sophos explicitly supports your deployment model.
+
+## Get an image you can boot
+
+Sophos publishes software images for **virtual** deployments. Download the **SFOS** build that matches your licensing path (home lab vs commercial) from **Sophos** or your partner portal—do not use random ISOs from third-party mirrors.
+
+Typical approaches on Proxmox:
+
+- Import a **virtual disk** format Proxmox understands (often via **qemu-img convert** from VMDK/OVA extraction), or
+- Boot the **ISO** installer on a fresh empty VM and run the **text/GUI installer** like bare metal.
+
+If you start from **OVA**, unpack it, convert disks to **qcow2**, attach them to a new VM, and match **virtio** drivers where the installer supports them for better performance.
+
+## Size the VM like a small appliance
+
+Start from Sophos **minimum** guidance for vCPU, RAM, and disk for your version, then add headroom if you enable **IPS**, **TLS inspection**, or heavy logging. Under-sized VMs feel like “the firewall is slow” when the bottleneck is **CPU for decryption** or **disk for logs**.
+
+- **Disk:** thin or thick **qcow2** on fast storage; log-heavy labs need more than you think.
+- **NICs:** plan **WAN**, **LAN**, and **DMZ** as **separate** Proxmox **bridges** (\`vmbr0\`, \`vmbr1\`, …) so you can mirror real topology instead of single-segment NAT tricks.
+
+## Networking that will save you pain
+
+1. **Linux bridges** on the Proxmox host map to **Sophos interfaces**. Label them in your head the same way you will in Azure or on hardware later.
+2. Use **VirtIO** network devices if the SFOS build supports them well on your version—fallback to **E1000** only if you hit driver quirks during install.
+3. For VLANs, either **trunk into Proxmox** and tag on the Sophos side, or attach **multiple bridges**—pick one style and stay consistent.
+
+## First boot checklist
+
+- Complete **initial setup wizard** on **LAN** access (browser to the management IP).
+- Set **admin** credentials, **time zone**, and **DNS** before you bolt on features.
+- **Register** or **license** according to your entitlement—unlicensed behaviour varies by feature.
+- Take a **Proxmox snapshot** only after the appliance is **cleanly shut down** if your storage supports quiescing; otherwise snapshot-aware backups are safer for production-like tests.
+
+## Lab habits that translate to production
+
+- Document **every** interface mapping (Proxmox bridge → Sophos port → VLAN purpose).
+- Export **configuration backups** from Sophos on a schedule and store them **off** the hypervisor.
+- When you outgrow the lab, **rebuild** on approved hardware or cloud images rather than blindly **migrating** a tinkered disk—clean installs reduce mystery gremlins.
+
+## What this post is not
+
+It is not a substitute for **Sophos release notes**, **support**, or your **compliance** requirements. Always validate **virtual deployment** guidance against the **current** SFOS documentation for your build.`,
+      labels: ["Virtualisation", "Firewall", "Configuration"],
+      publishedAt: new Date("2026-04-05T09:00:00.000Z"),
+    },
+    {
+      slug: "sophos-firewall-azure-ha-load-balancer-central",
+      title:
+        "Sophos Firewall in Azure: HA with load balancers, and why Central beats “cluster sync” here",
+      excerpt:
+        "Azure HA for Sophos is not the same as plugging two appliances into the same LAN. Use Azure Load Balancer with health probes, then align policy across nodes with Sophos Central—because you are orchestrating two independent firewalls, not one clustered brain.",
+      content: `## On-prem HA vs Azure: the mental model shift
+
+On **hardware** or a classic datacenter, **high availability** for firewalls often means **paired appliances**: heartbeat links, **floating** or **shared** addressing, and **state replication** so failover feels like one logical unit. Configuration is **synchronized** between nodes by the HA mechanism itself.
+
+In **Microsoft Azure**, you typically deploy **two (or more) separate virtual machines**, each with its **own** OS disk, **own** NICs, and **own** lifecycle. Azure does not give you a shared L2 segment that behaves like two firewalls holding hands on the same wire. Instead, **Azure Load Balancer** (or **Azure Gateway Load Balancer** in some designs) sits in front of—or beside—your design and steers traffic based on **health probes** and **rules**.
+
+**Result:** your “HA pair” in Azure is often **two independent Sophos Firewall instances** that **share responsibility** for traffic via **Azure networking**, **not** a single Sophos HA cluster in the traditional on-prem sense. Failover is **orchestrated** by **Azure** path selection and **your** routing design, plus **healthy** backends—not by a proprietary cluster link between the VMs.
+
+## What Azure Load Balancer is doing
+
+For inbound flows you commonly:
+
+- Place an **Azure Load Balancer** (**public** or **internal**) in front of the **NICs** that should receive traffic.
+- Define **backend pools** containing the **private IPs** of each **Sophos** VM (or the relevant front-end interface, depending on topology).
+- Configure **health probes** (TCP/HTTP/HTTPS) that match what Sophos actually answers on the probed port—if the probe fails, Azure **stops** sending new flows to that node.
+
+For **egress** and **symmetric** flows, you also need a coherent plan for **SNAT**, **user-defined routes**, and **NVAs** (network virtual appliances). Sophos publishes **reference architectures** for Azure—use them as the baseline rather than inventing topology from memory.
+
+## Why configuration does not “just sync” like on-prem HA
+
+Because the firewalls are **not** in a classic **Sophos HA pair** in the same way as two appliances in one rack, you should **not** assume:
+
+- automatic **object-level** sync,
+- **session** sync for every feature, or
+- identical **failover** behaviour without testing.
+
+You must treat each VM as a **first-class** firewall with its **own** runtime state, then **deliberately** align **policy** between them.
+
+## Sophos Central and “management parity”
+
+This is where **Sophos Central** and **central firewall management** come in—what you may see documented as **Firewall Management** with **group-style** or **template-style** workflows (including concepts referred to under **Group Policy Management** in the Central experience for keeping appliances aligned).
+
+Use Central to:
+
+- **Apply consistent** rulebases, **objects**, and **policies** to **both** Azure firewalls where your subscription allows it.
+- Reduce **configuration drift** when an admin changes one node and forgets the other.
+- **Audit** changes and maintain **change discipline** appropriate to **two live** edges.
+
+**It is still not magic:** you are **replicating intent** through management tooling, not relying on a single **cluster brain**. Validate that every **NAT**, **VPN**, and **dynamic** object behaves the same on **both** units after a change. Some features may still need **manual** parity checks per Sophos guidance for **multi-site** or **standalone** peers.
+
+## A practical workflow
+
+1. **Design** Azure networking first: **VNet**, **subnets**, **UDRs**, **load balancer** SKU, **probe** endpoints.
+2. Deploy **two** Sophos **SFOS** VMs from the **supported** Azure image path, each **licensed** and **registered** to **Central** as appropriate.
+3. Attach them to **backend pools** and prove **probe** health **independently** (take one VM offline and watch traffic shift).
+4. Build **policy** in Central (or build once and **assign** to both) so **firewall rules**, **IPS** profiles, and **common objects** stay aligned.
+5. **Test failover** at **application** level: DNS TTLs, **SNAT** stickiness, **VPN** tunnels, and **asymmetric** routing are where Azure + firewall combos usually bite.
+
+## Summary
+
+- **Azure HA** for Sophos is **not** the same as **traditional appliance HA**—think **load-balanced independent nodes**.
+- **Azure Load Balancer** + **probes** decide **who is live** for new flows; **you** must design **routing** and **NAT** correctly.
+- Use **Sophos Central** (**Firewall Management** / **group** or **template** workflows—including approaches described as **Group Policy Management** for aligned policy) to **duplicate** and **maintain** configuration across firewalls instead of assuming **built-in HA sync**.
+
+Always confirm **feature support**, **licensing**, and **Azure** reference designs in **current Sophos documentation**—cloud UI names and capabilities change faster than blog paragraphs.`,
+      labels: ["Azure", "Cloud Infrastructure", "Firewall", "Configuration"],
+      publishedAt: new Date("2026-04-06T09:00:00.000Z"),
+    },
   ] as const;
 
   for (const post of exampleBlogPosts) {
