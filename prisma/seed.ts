@@ -340,6 +340,101 @@ Assign to a small **pilot** group first. On a test device, confirm **Company Por
       labels: ["Intune", "Endpoint", "Configuration"],
       publishedAt: new Date("2026-04-03T12:00:00.000Z"),
     },
+    {
+      slug: "unifi-segmentation-main-guest-iot-casting",
+      title:
+        "UniFi segmentation on a Dream Machine Pro: Main, Guest, IoT—and still Cast / AirPlay",
+      excerpt:
+        "Split Main, Guest, and IoT networks on a UDM Pro, keep IoT off your trusted LAN, and allow Chromecast and AirPlay from phones and laptops without flattening security.",
+      content: `## What we are aiming for
+
+Three **logical networks** on your **UniFi Dream Machine Pro (UDM Pro)**:
+
+- **Main** — laptops, phones, NAS, trusted devices.
+- **Guest** — visitors and untrusted clients, isolated from Main.
+- **IoT** — speakers (Sonos), voice assistants (Alexa/Google), TVs, **Home Assistant**, smart plugs, cameras: things that phone home, rarely need to talk to your PCs, and are a favourite target for botnets.
+
+You still want **Google Cast** and **AirPlay** to work when the **controller** (phone, tablet, browser) is on **Main** or **Guest**, while **speakers and displays** live on **IoT**. That breaks by default because discovery uses **multicast DNS (mDNS / Bonjour)** and **SSDP**, which do not cross VLANs unless you design for it.
+
+## Why IoT gets its own VLAN
+
+IoT devices should not browse your SMB shares or poke at printers. A simple pattern:
+
+- **IoT → Main / Guest:** **blocked** (with narrow exceptions if you truly need HA talking to a specific server—prefer reverse connections instead).
+- **Main / Guest → IoT:** **allowed** for the services you need (streaming, Home Assistant UI, etc.).
+- **IoT → Internet:** **allowed** (updates, clouds) unless you run a strict deny-all egress lab.
+
+On UniFi, that usually means **separate VLANs**, **WiFi SSIDs** mapped to those networks, and **firewall rules** (plus DNS filtering if you use it).
+
+## Build the networks on the UDM Pro
+
+Exact clicks move between UniFi Network versions, but the shape is stable:
+
+1. **Settings → Networks** — create VLANs (e.g. Main = native LAN or VLAN 10, Guest = VLAN 20, IoT = VLAN 30). Assign subnets and DHCP pools.
+2. **Settings → WiFi** — create SSIDs: e.g. \`Home\` → Main, \`Guest\` → Guest (enable **guest policies** / client isolation as offered), \`IoT\` → IoT VLAN.
+3. **Firewall** — start from a **default deny** from IoT to RFC1918 **except** what you explicitly allow, or use UniFi’s **Traffic & Security** / **Firewall** UI to add **“Block IoT to LAN”** style rules. Your UDM Pro is the router—rules apply **before** traffic leaves the gateway.
+
+Document your **CIDRs** (e.g. \`192.168.10.0/24\` Main, \`192.168.20.0/24\` Guest, \`192.168.30.0/24\` IoT) so firewall rules stay readable.
+
+## Why Cast and AirPlay break across VLANs
+
+- **Discovery** relies on **mDNS** (UDP **5353**) and **multicast**, not only a single TCP port.
+- **AirPlay** and **Chromecast** expect the controller to **see** the receiver on the network via Bonjour-style names.
+- **Guest WiFi** often has **client isolation** and extra blocks—casting from Guest to IoT needs **both** discovery and **session** traffic permitted.
+
+So you need **two** things: **multicast / mDNS handling** between VLANs, and **stateful firewall rules** that allow **Main → IoT** and **Guest → IoT** for streaming while keeping **IoT → Main** closed.
+
+## Multicast DNS (mDNS) on UniFi
+
+UniFi has moved menus over time; on recent **Network** apps for the UDM Pro, look under **Settings** for anything named like **Multicast DNS**, **mDNS**, or **Multicast / Bonjour** services that **reflect** or **bridge** discovery between VLANs.
+
+If your build exposes it:
+
+- **Enable mDNS / multicast reflection** between **Main**, **Guest**, and **IoT** (or at least from Main+Guest **toward** IoT). That lets phones find \`Kitchen TV._googlecast._tcp.local\` or AirPlay targets on the IoT subnet.
+
+If your controller version **does not** offer a tidy global toggle:
+
+- Some admins run an **mDNS reflector** on a small Linux/RPi box on multiple VLANs—outside the scope of this post, but it is the fallback when the gateway cannot reflect Bonjour.
+
+After any change, **reboot a test phone**—mDNS caches aggressively.
+
+## Firewall rules that match the goal
+
+Think in **direction**:
+
+1. **Allow established / related** return traffic (UniFi often does this implicitly; confirm for your rule set).
+2. **Allow Main → IoT** and **Guest → IoT** for:
+   - **UDP 5353** (mDNS) if you are not using a reflector and are testing—often **not** enough alone across VLANs; pairing with mDNS reflection is the usual fix.
+   - **TCP/UDP** for the actual streaming session—Chromecast and AirPlay use additional ranges; **vendor docs** list current ports. Apple and Google publish port lists for AirPlay and Cast—use them when tightening rules.
+3. **Block IoT → Main** and **IoT → Guest** for **new** connections (exceptions only for things like Home Assistant to one specific IP if you must).
+
+**Guest → IoT:** Guest WiFi may block **AP-to-AP** or **LAN** access by default. You may need a **specific rule** that allows **Guest subnet → IoT subnet** for casting, while still blocking **Guest → Main**.
+
+**Main → IoT:** Usually allowed once you add positive rules; confirm **WiFi** → **IoT** is not blocked by a **“block inter-VLAN”** switch on the SSID.
+
+## Sonos, Home Assistant, and the rest
+
+- **Sonos** often needs **discovery** between controller and speakers plus **HTTP** control to speakers. Keep controllers and Sonos on the same **logical “audio” policy**: if Sonos is on IoT, allow **Main/Guest → IoT** for Sonos documented ports after mDNS works.
+- **Home Assistant** on IoT should be reached by browsers on Main via **HTTPS** to its IP or name; use **Split DNS** or local DNS records so you do not need IoT to initiate to Main.
+
+## Testing on a UDM Pro
+
+1. Put a **Chromecast** or **Apple TV** on **IoT** only.
+2. Join a phone to **Main** SSID—confirm the **Google Home** or **screen mirror** target appears.
+3. Join the same phone to **Guest**—repeat. If discovery fails only on Guest, the issue is **guest isolation** or **missing Guest → IoT** allow rules.
+4. Use **Insights → Traffic** (or **Flow Analytics**) on the UDM Pro to see **drops** on firewall rules you created—adjust until you see **allow** hits for the right subnets.
+
+## Summary
+
+- **Segment** into **Main**, **Guest**, and **IoT** VLANs with **WiFi** mapped to each.
+- **Default deny IoT toward trusted LANs**, allow **Main/Guest → IoT** for what you need.
+- **Enable mDNS / multicast reflection** (or an external reflector) so **Cast** and **AirPlay** can **discover** receivers on IoT.
+- **Layer firewall rules** for **Guest** carefully so visitors get casting **without** reaching your **Main** network.
+
+UI names change—**search UniFi’s release notes for “mDNS” or “multicast”** for your exact Network version. When in doubt, capture **one** failing discovery with a packet trace on the IoT VLAN and adjust rules until you see **UDP 5353** and the stream ports flowing **from phone VLAN to IoT VLAN**.`,
+      labels: ["Networking", "Firewall", "Configuration"],
+      publishedAt: new Date("2026-04-04T10:00:00.000Z"),
+    },
   ] as const;
 
   for (const post of exampleBlogPosts) {
