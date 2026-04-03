@@ -277,6 +277,69 @@ Align internal zones with device trust signals; avoid flat internal DNS that mir
       labels: ["DNS", "Networking", "Cyber Security"],
       publishedAt: new Date("2025-07-22T16:45:00.000Z"),
     },
+    {
+      slug: "package-exe-intunewin-silent-intune",
+      title: "Package an .exe for silent deployment: build an .intunewin for Intune",
+      excerpt:
+        "Use Microsoft’s Win32 Content Prep Tool to wrap your installer folder into an .intunewin, then publish a Win32 app with silent install and detection.",
+      content: `## What you are building
+
+Intune deploys **Win32 apps** from a packaged file named **.intunewin**. That file is **not** your .exe renamed—it is output from **Microsoft Win32 Content Prep Tool** (often called **IntuneWinAppUtil**), which zips your **source folder** and encrypts it for upload to Intune.
+
+## Before you start
+
+- Confirm **silent switches** for your installer (vendor docs, \`/S\`, \`/quiet\`, \`/qn\`, etc.). Intune needs a command that returns quickly and does not prompt the user.
+- Put **everything the setup needs** in one folder: the .exe (or setup.exe), transforms, config files, or extra MSIs if the vendor requires them side-by-side.
+
+## Folder layout
+
+Example:
+
+\`\`\`text
+C:\\Packages\\MyApp\\
+  setup.exe
+  (optional extra files the vendor requires)
+\`\`\`
+
+The prep tool will ask for this folder as the **source** path.
+
+## Build the .intunewin
+
+1. Download **Win32 Content Prep Tool** from Microsoft (search for “Win32 app packaging tool” / IntuneWinAppUtil).
+2. Run **IntuneWinAppUtil.exe** (GUI or command line).
+3. Provide:
+   - **Source folder**: \`C:\\Packages\\MyApp\` (folder containing setup.exe).
+   - **Setup file**: the main installer name, e.g. \`setup.exe\`.
+   - **Output folder**: where to write the finished package (e.g. \`C:\\Packages\\output\`).
+4. When it finishes, you get **\`MyApp.intunewin\`** (name follows your setup file / folder naming).
+
+Command-line example (same idea; paths may vary):
+
+\`\`\`text
+IntuneWinAppUtil.exe -c C:\\Packages\\MyApp -s setup.exe -o C:\\Packages\\output
+\`\`\`
+
+## Upload to Intune
+
+1. **Microsoft Intune admin center** → **Apps** → **All apps** → **Add** → **Windows app (Win32)**.
+2. Select your **.intunewin** file and complete app information.
+3. **Install command**: full silent command, e.g. \`setup.exe /S\` or whatever the vendor documents (test on a VM first).
+4. **Uninstall command**: use the vendor’s documented uninstall, or MSI product code if the app is an MSI under the hood.
+5. **Requirements**: OS architecture, minimum Windows version, disk space if needed.
+6. **Detection rules**: Prefer **MSI** product code/version if the installer is MSI-based; otherwise **file** or **registry** key that proves the app version you deployed. A bad detection rule is the most common reason installs “succeed” but show as failed in Intune.
+
+## Assign and test
+
+Assign to a small **pilot** group first. On a test device, confirm **Company Portal** or policy triggers install, no UI prompts, and detection shows **Installed**.
+
+## Practical tips
+
+- Re-run the prep tool whenever you change the installer bits or folder contents; the .intunewin is tied to that snapshot.
+- Keep a short README in your package repo with the exact **install**, **uninstall**, and **detection** values you used—future you will thank you.
+- If the install only works when run from a specific working directory, bake that into a small wrapper script and package the script plus binaries, or use \`cmd /c\` / PowerShell with explicit paths in the Intune install command.`,
+      labels: ["Intune", "Endpoint", "Configuration"],
+      publishedAt: new Date("2026-04-03T12:00:00.000Z"),
+    },
   ] as const;
 
   for (const post of exampleBlogPosts) {
