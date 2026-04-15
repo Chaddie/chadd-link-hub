@@ -7,6 +7,12 @@ const FITNESS_TRACKER = {
   description: "Training and workout tracking app.",
 } as const;
 
+const STUDY_GUIDE = {
+  label: "Study Guide",
+  url: "https://study-guide-pearl.vercel.app/dashboard",
+  description: "Grok-powered learning dashboard.",
+} as const;
+
 const SIMMER_EATS = {
   label: "SIMMER EATS",
   url: "https://www.simmereats.com/r/NATHAN-KTH",
@@ -56,6 +62,15 @@ function isThreeCandidate(l: { url: string; label: string }) {
   return u.includes("2stgk2pa");
 }
 
+/** Matches Study Guide project rows (canonical URL, label, or study-guide-pearl host). */
+function isStudyGuideCandidate(l: { url: string; label: string }) {
+  const u = l.url.trim().toLowerCase();
+  const lab = l.label.trim().toLowerCase();
+  if (lab === "study guide") return true;
+  if (normalizeUrl(l.url) === normalizeUrl(STUDY_GUIDE.url)) return true;
+  return u.includes("study-guide-pearl.vercel.app");
+}
+
 async function mergeCanonicalReferral(
   tx: Prisma.TransactionClient,
   sectionId: string,
@@ -101,8 +116,8 @@ async function mergeCanonicalReferral(
 }
 
 /**
- * Idempotent fixes: removes legacy "Personal Blogs" sections, ensures exactly one
- * Fitness Tracker link under Projects, and canonical referral rows under Referrals.
+ * Idempotent fixes: removes legacy "Personal Blogs" sections, ensures canonical
+ * Fitness Tracker and Study Guide links under Projects, and canonical referral rows under Referrals.
  * Safe to call when the DB is available.
  */
 export async function ensureSiteLinkHubData(): Promise<void> {
@@ -175,6 +190,19 @@ export async function ensureSiteLinkHubData(): Promise<void> {
           },
         });
       }
+
+      const projectLinksForStudy = await prisma.link.findMany({
+        where: { sectionId: projects.id },
+        orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+      });
+
+      await mergeCanonicalReferral(
+        prisma,
+        projects.id,
+        projectLinksForStudy,
+        isStudyGuideCandidate,
+        STUDY_GUIDE
+      );
     }
 
     if (referrals) {

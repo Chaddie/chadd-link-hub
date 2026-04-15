@@ -156,6 +156,13 @@ async function main() {
       sectionKey: "projects",
       order: 3,
     },
+    {
+      label: "Study Guide",
+      url: "https://study-guide-pearl.vercel.app/dashboard",
+      description: "Grok-powered learning dashboard.",
+      sectionKey: "projects",
+      order: 4,
+    },
   ];
 
   await prisma.link.deleteMany({
